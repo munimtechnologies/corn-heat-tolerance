@@ -14,9 +14,13 @@ Code Apache-2.0; text and derived tables CC BY 4.0.
   committed before any soybean data were read and before any corn result existed.
 - Pre-registration 0.3.0 (where drought-tolerant corn was adopted most):
   [PREREG-DT.md](PREREG-DT.md), committed before any result of 0.1.0 or 0.2.0 existed.
+- Pre-registration 0.4.0 (dryland versus irrigated fields in the same county):
+  [PREREG-IRR.md](PREREG-IRR.md), committed before any earlier result existed and before
+  any irrigated or non-irrigated yield was read.
 - Data: USDA NASS Quick Stats county corn and soybean yields (public domain), NOAA
   nClimGrid-Daily county averages, and the 2020 Census county gazetteer. State adoption
-  groups come from USDA ERS (EIB-204, 2019; 2016 ARMS).
+  groups and the dryland/irrigated adoption gap come from USDA ERS (EIB-204, 2019; 2016
+  ARMS; Chart of Note, 29 July 2019).
 - Model: log yield on growing and extreme degree days (single sine; 29 °C for corn,
   30 °C for soybeans) and precipitation, with county-by-era fixed effects,
   state-by-era quadratic trends, three eras (1951-1980, 1981-2010, 2011-2025) and
@@ -31,22 +35,29 @@ Code Apache-2.0; text and derived tables CC BY 4.0.
   judged by year-clustered inference together with randomization inference over all 36
   two-state splits. A secondary version splits counties into the driest and wettest
   thirds by 1981-2010 rainfall.
+- Irrigation step: within the same Nebraska and Kansas counties, dryland fields (60% DT
+  in Nebraska in 2016) against irrigated fields (31%), each net of soybeans on the same
+  practice. Eras are 1981-2010 and 2011-2018, because NASS stopped county yields by
+  practice after the 2018 crop. The test is judged by year-clustered inference with a
+  1981-1995 vs 1996-2010 placebo.
 
 ## Run
 
 ```
 pip install numpy
-python -m unittest -v test_cornheat test_soyheat test_dtstate
+python -m unittest -v test_cornheat test_soyheat test_dtstate test_irrpractice
 python run_cornheat.py --data-dir /data --out-dir /out
 python soyheat.py --data-dir /data --out-dir /out
 python dtstate.py --data-dir /data --out-dir /out
+python irrpractice.py --data-dir /data --out-dir /out
 ```
 
 The scripts stream the roughly 1 GB NASS bulk file and about 1,600 monthly nClimGrid
 files without keeping them. They cache only small derived tables under
-`<data-dir>/cornheat/`, which all three scripts share. Results go to
-`<out-dir>/cornheat_results.json`, `soyheat_results.json` and `dtstate_results.json`,
-each with the automatic grading of its pre-registered predictions.
+`<data-dir>/cornheat/`, which all four scripts share. Results go to
+`<out-dir>/cornheat_results.json`, `soyheat_results.json`, `dtstate_results.json` and
+`irrpractice_results.json`, each with the automatic grading of its pre-registered
+predictions.
 
 ## Files
 
@@ -55,13 +66,15 @@ each with the automatic grading of its pre-registered predictions.
 - `run_cornheat.py`: the corn pipeline and the 0.1.0 grading
 - `soyheat.py`: the soybean pipeline, joint corn-soybean model and the 0.2.0 grading
 - `dtstate.py`: the adoption-group triple difference, randomization inference and the 0.3.0 grading
-- `fetch_deps.py`, `fetch_deps_dt.py`: fetch the earlier modules at their pre-registration
-  commits; the second also refuses to run until PREREG-DT.md is public
-- `test_cornheat.py`, `test_soyheat.py`, `test_dtstate.py`: hand-checked unit tests and
-  synthetic-panel recovery tests
+- `irrpractice.py`: the dryland/irrigated triple difference, placebo and the 0.4.0 grading
+- `fetch_deps.py`, `fetch_deps_dt.py`, `fetch_deps_irr.py`: fetch the earlier modules at
+  their pre-registration commits; the last two also refuse to run until their
+  pre-registration is public
+- `test_cornheat.py`, `test_soyheat.py`, `test_dtstate.py`, `test_irrpractice.py`:
+  hand-checked unit tests and synthetic-panel recovery tests
 
 ## Status
 
-Pre-registered 2026-11-17 (0.1.0 corn, then 0.2.0 soybeans, then 0.3.0 adoption groups).
-Results will be added here once the jobs have run. Whichever way they fall, they will not
-be re-graded.
+Pre-registered on 2026-11-17, in order: 0.1.0 corn, 0.2.0 soybeans, 0.3.0 adoption
+groups, 0.4.0 dryland versus irrigated. Results will be added here once the jobs have
+run. Whichever way they fall, they will not be re-graded.

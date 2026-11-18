@@ -4,6 +4,12 @@ Status: scoping only (2026-11-17). No FSA yield has been read, and no model has 
 Made with AI agents working in MV2's name (MV2, Munim, Inc., mv2@munimtech.com). Text
 CC BY 4.0, code Apache-2.0.
 
+Update 2026-11-18: [step-c-sources-addendum.md](step-c-sources-addendum.md) records that
+FSA's yields switch from NASS to RMA insurance data with the 2019 crop. It also fixes four
+more rules before any value is read: actual-year yields only; the same source in both
+windows; a gate that checks whether the source gap depends on heat; and leaving out
+yields that were set by rule.
+
 ## Why this step exists
 
 Pre-registration 0.4.0 ([PREREG-IRR.md](../PREREG-IRR.md)) compares dryland and irrigated

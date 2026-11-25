@@ -7,7 +7,7 @@ end between 2005 and 2019. This project extends the test through the 2025 harves
 using public county data. Published studies also disagree about the direction: a 2021
 long-difference study reports that corn's loss per extreme-heat degree day fell by
 about half since 1960, and a 2026 rolling-window study reports that it rose by about
-20%. Steps 0.6.0 and 0.7.0 test both on the same data.
+20%. Steps 0.6.0, 0.7.0 and 0.7.1 test both on the same data.
 
 By MV2, Munim, Inc. (mv2@munimtech.com). Made with AI agents working in MV2's name.
 Code Apache-2.0; text and derived tables CC BY 4.0.
@@ -33,6 +33,11 @@ Code Apache-2.0; text and derived tables CC BY 4.0.
   from whether hotter counties' yields grew faster. The step tests whether that fall
   replicates, and whether it shrinks when counties are compared only within their own
   state (regional catch-up rather than heat adaptation), for corn and soybeans.
+- Pre-registration 0.7.1 (Yu et al.'s exact variables): [PREREG-LD-YU.md](PREREG-LD-YU.md),
+  committed on 2026-11-25 before any result existed. It repeats the 0.7.0 test with
+  their own definitions (April-September, degree days 0-29 C and above 29 C for both
+  crops, rainfall as shortfall below and excess above 42 cm, counties kept if present in
+  both periods) and grades the replication of the size of their fall.
 - Data: USDA NASS Quick Stats county corn and soybean yields (public domain), NOAA
   nClimGrid-Daily county averages, and the 2020 Census county gazetteer. State adoption
   groups and the dryland/irrigated adoption gap come from USDA ERS (EIB-204, 2019; 2016
@@ -67,21 +72,23 @@ Code Apache-2.0; text and derived tables CC BY 4.0.
 
 ```
 pip install numpy
-python -m unittest -v test_cornheat test_soyheat test_dtstate test_irrpractice test_rcheck test_ldiff
+python -m unittest -v test_cornheat test_soyheat test_dtstate test_irrpractice test_rcheck test_ldiff test_ldiff_yu
 python run_cornheat.py --data-dir /data --out-dir /out
 python soyheat.py --data-dir /data --out-dir /out
 python dtstate.py --data-dir /data --out-dir /out
 python irrpractice.py --data-dir /data --out-dir /out
 python rcheck.py --data-dir /data --out-dir /out
 python ldiff.py --data-dir /data --out-dir /out
+python ldiff_yu.py --data-dir /data --out-dir /out
 ```
 
 The scripts stream the roughly 1 GB NASS bulk file and about 1,600 monthly nClimGrid
 files without keeping them. They cache only small derived tables under
-`<data-dir>/cornheat/`, which all the scripts share. Results go to
-`<out-dir>/cornheat_results.json`, `soyheat_results.json`, `dtstate_results.json`,
-`irrpractice_results.json`, `rcheck_results.json` and `ldiff_results.json`, each with
-the automatic grading of its pre-registered predictions.
+`<data-dir>/cornheat/`, which all the scripts share (`ldiff_yu.py` only reads them).
+Results go to `<out-dir>/cornheat_results.json`, `soyheat_results.json`,
+`dtstate_results.json`, `irrpractice_results.json`, `rcheck_results.json`,
+`ldiff_results.json` and `ldiff_yu_results.json`, each with the automatic grading of its
+pre-registered predictions.
 
 ## Files
 
@@ -95,11 +102,14 @@ the automatic grading of its pre-registered predictions.
   and the 0.6.0 grading
 - `ldiff.py`: the flexible long differences with and without state fixed effects, the
   0.7.0 grading and the joint verdict with 0.6.0
+- `ldiff_yu.py`: the same models on Yu et al.'s exact variables and the 0.7.1 grading
 - `fetch_deps.py`, `fetch_deps_dt.py`, `fetch_deps_irr.py`, `fetch_deps_rc.py`,
-  `fetch_deps_ld.py`: fetch the earlier modules at their pre-registration commits; all
-  but the first also refuse to run until their pre-registration is public
+  `fetch_deps_ld.py`, `fetch_deps_yu.py`: fetch the earlier modules at their
+  pre-registration commits; all but the first also refuse to run until their
+  pre-registration is public
 - `test_cornheat.py`, `test_soyheat.py`, `test_dtstate.py`, `test_irrpractice.py`,
-  `test_rcheck.py`, `test_ldiff.py`: hand-checked unit tests and synthetic recovery tests
+  `test_rcheck.py`, `test_ldiff.py`, `test_ldiff_yu.py`: hand-checked unit tests and
+  synthetic recovery tests
 - `inspect_fsa.py` and `docs/`: the structure-only inspector and scoping notes for the
   FSA practice-yield step, written before any FSA yield was read
 
@@ -108,12 +118,15 @@ the automatic grading of its pre-registered predictions.
 Schlenker & Roberts (PNAS 2009); Burke & Emerick (AEJ: Economic Policy 2016); Yu, Miao &
 Khanna (Scientific Reports 2021); Raghuram & Coffel (Environmental Research Letters 2026);
 Zhao et al. (Nature Food 2026, crop-specific heat thresholds); Ghanem, Pretis & Schuurman
-(arXiv:2607.22028, 2026, on long-difference versus fixed-effects comparisons).
+(arXiv:2607.22028, 2026, on long-difference versus fixed-effects comparisons); Valente
+(SSRN 6898120, 2026, county differences in corn's heat losses from long differences).
 
 ## Status
 
 Pre-registered, in order: 0.1.0 corn, 0.2.0 soybeans, 0.3.0 adoption groups, 0.4.0
 dryland versus irrigated (all 2026-11-17), 0.6.0 replication of the June 2026
-rising-sensitivity result (2026-11-19) and 0.7.0 reconciliation with the 2021
-falling-sensitivity result (2026-11-20). Results will be added here once the jobs have
-run. Whichever way they fall, they will not be re-graded.
+rising-sensitivity result (2026-11-19), 0.7.0 reconciliation with the 2021
+falling-sensitivity result (2026-11-20) and 0.7.1 the same on Yu et al.'s exact
+variables (2026-11-25). The analysis jobs are queued for compute and none has run yet.
+Results will be added here once they have. Whichever way they fall, they will not be
+re-graded.
